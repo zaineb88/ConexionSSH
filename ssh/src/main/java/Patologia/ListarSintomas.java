@@ -1,16 +1,19 @@
-package ssh;
-
+package Patologia;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 
-public class MainSSH {
+
+public class ListarSintomas {
+	
+
 	
 	private final static String S_PATH_FILE_PRIVATE_KEY = "id_rsa.ppk"; //\\windows absolut path of our ssh private key locally saved
 	private final static String S_PATH_FILE_KNOWN_HOSTS = "known_hosts";
@@ -47,17 +50,19 @@ public class MainSSH {
 		sesion.disconnect();
 	}
 
+
 	
 	
-	public static void main(String[] args) throws Throwable {
-		
-		
+	public static List<Sintomas> consultaSintoma () throws Throwable
+	
+	{
+	 
+
 		Connection conn = null;
 		ResultSet rset = null;
-		ResultSet rset2 = null;
-		ResultSet rset3 = null;
 		Statement stmt = null;
-		
+		List <Sintomas> lista_s;
+		lista_s = new ArrayList<Sintomas>();
 		try
 		{
 			
@@ -67,63 +72,38 @@ public class MainSSH {
 			DriverManager.registerDriver (new com.mysql.jdbc.Driver());// método equivalente al anterior
 			//Sea como sea, es, <<oye, si te piden una conexión, se la pides a esa clase!>>
 			conn = DriverManager.getConnection (cadena_conexion, user, password);
-  	        stmt = conn.createStatement();
-			rset = stmt.executeQuery("SELECT des_sint FROM Sintomas where id_sint = 1");
-			String nombre = null;
-			Integer id = null;
+	        stmt = conn.createStatement();
+	        
+	        /////////// consulta de los sintomas
+	        
+	        System.out.println("-----LA LISTA DE SINTOMAS-----\n");
+	        
+			rset = stmt.executeQuery("SELECT * FROM Sintomas");
+			String sintoma = null;
+			int id=0;
 			while (rset.next())
 				
 			    {
-					  
-					nombre = rset.getString(1);
+					  id=rset.getInt(1);
+					sintoma = rset.getString(2);
 					
-					System.out.println("Sintoma  = "+nombre);
-				 }
-			
-			/////////////////////////////
-			
-			rset2 = stmt.executeQuery(" SELECT nom_patol From Patologias Where id_patol IN (Select id_patol From Patologias Where id_patol=1)");
-			String nom = null;
-			
-			while (rset2.next())
-				
-			    {
-					  
-					nom = rset2.getString(1);
 					
-					System.out.println("PATOLOGIA N 1 ES  = "+nom);
-				 }
-			//////////////////////////////
+					System.out.println(sintoma);
+					Sintomas sin=new Sintomas(id, sintoma);
+		            	lista_s.add(sin);
 			
-			rset3 = stmt.executeQuery(" SELECT * From Patologias Where nom_patol='Queratocono'");
-			//rset3 = stmt.executeQuery(" SELECT des_patol,trat_patol,causa_patol,des_sint From Patologias p,Causas c,Sintomas s Where p.id_patol= c.Patologias_id_patol and c.Stintomas_id_sint=s.id_sint and nom_patol='Queratocono'");
-		//	rset3 = stmt.executeQuery(" SELECT des_patol,trat_patol,causa_patol,des_sint From Patologias p,Causas c whre p.id_patol=c.Patologias_id_patol and Sintomas_id_sint in (select id_sint from Sintomas)");
-			String descripcion = null;
-			String tratamiento = null;
-			String causas = null;
-		//	String sintomas=null;
+				 }	
 			
-			while (rset3.next())
-				
-			    {
-					  
-					descripcion = rset3.getString(3);
-					tratamiento = rset3.getString(4);
-					causas = rset3.getString(5);
-					//sintomas = rset3.getString();
-					
-					System.out.println("Descripcion de la patologia es   = "+descripcion +"\n");
-					System.out.println("Tratamiento de la patologia es   = "+tratamiento+"\n");
-					System.out.println("Causas de la patologia es   = "+causas+"\n");
-					//System.out.println("Sintomas de la patologia es   = "+sintomas);
-				 }
-			////////////////////////
+		
+		
+		
 		}
+
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
-		finally //libero recursos, de "adentro a fuera" , ResultSet, Statment, Conexion
+		finally 
 		{
 			if (rset != null) 	{ try { rset.close(); } catch (Exception e2) { e2.printStackTrace(); }}
 			if (stmt != null)	{ try {	stmt.close(); } catch (Exception e2) { e2.printStackTrace(); }}
@@ -131,7 +111,25 @@ public class MainSSH {
 		  	desconectate_D_SSH(); 
 		}   
 
+
+	 return lista_s;
+	}
+	
+	
+	
+	
+	
+	
+	public static void main(String[] args) throws Throwable {
+		
+		
+		consultaSintoma();
 		
 	}
+	
+	
+	
 
 }
+
+
