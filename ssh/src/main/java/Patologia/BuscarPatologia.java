@@ -1,4 +1,7 @@
 package Patologia;
+import java.util.ArrayList;
+import java.util.List;
+
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,6 +10,9 @@ import java.sql.Statement;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+
+
+
 
 public class BuscarPatologia {
 	
@@ -48,15 +54,33 @@ public class BuscarPatologia {
 	
 	
 	public static void main(String[] args) throws Throwable {
+	
+		///////////no finciona el boucle no ser porque
+		
+//	List<Patologia> le=listarPatologia(1);
+//	
+//	
+//	for(int i=0;i<le.size();i++)
+//	{
+//		System.out.println(le);
+//	}
+//		for(Patologia p: le)
+//		{
+//			System.out.println(p);
+//		}
+//		
 		
 		listarPatologia(1);
-		
 	}
 	
-	public static Patologia listarPatologia (int id) throws Throwable
+	public static  List<Patologia> listarPatologia (int id) throws Throwable
+	
+	
 	{ 
-		Patologia patol=null;;
+		List<Patologia> lista_p = null;
 		
+		lista_p = new ArrayList<Patologia>();
+	
 		Connection conn = null;
 		ResultSet rset = null;
 		Statement stmt = null;
@@ -67,8 +91,7 @@ public class BuscarPatologia {
 			
 			conectate_A_SSH();
 			
-			DriverManager.registerDriver (new com.mysql.jdbc.Driver());// método equivalente al anterior
-			//Sea como sea, es, <<oye, si te piden una conexión, se la pides a esa clase!>>
+			DriverManager.registerDriver (new com.mysql.jdbc.Driver());
 			conn = DriverManager.getConnection (cadena_conexion, user, password);
   	        stmt = conn.createStatement();
 			rset = stmt.executeQuery(" SELECT * From Patologias Where id_patol="+id);
@@ -90,7 +113,14 @@ public class BuscarPatologia {
 					System.out.println("Tratamiento de la patologia es   : "+tratamiento+"\n");
 					System.out.println("Causas de la patologia es   : "+causas+"\n");
 		
+			Patologia p = new Patologia(id, nom_patol,descripcion ,tratamiento,causas);
+			
+			
+			lista_p.add(p);
+	//	lista_p.add((Patologia) ListarSintomas.consultaSintoma());
 				 }
+
+			
 			
 		}
 		catch(Exception e)
@@ -111,7 +141,7 @@ public class BuscarPatologia {
 		
 		
 		/////////////////////
-		return patol;
+		return lista_p;
 		
 	}
 

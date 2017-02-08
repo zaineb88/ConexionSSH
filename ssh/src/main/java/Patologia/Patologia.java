@@ -1,5 +1,7 @@
 package Patologia;
 
+import java.util.List;
+
 public class Patologia {
 
 	
@@ -18,6 +20,9 @@ public class Patologia {
 		this.tratamiento = tratamiento;
 		this.causa = causa;
 		
+	}
+	public Patologia() {
+		// TODO Auto-generated constructor stub
 	}
 	public int getId_patol() {
 		return id_patol;
@@ -49,6 +54,7 @@ public class Patologia {
 	public void setCausa(String causa) {
 		this.causa = causa;
 	}
-	
+
+
 	
 }
