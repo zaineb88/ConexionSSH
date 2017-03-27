@@ -10,16 +10,22 @@ public class Patologia {
 	private String des_patol;
 	private String tratamiento;
 	private String causa;
+	private List<Sintomas> lista_sintomas;
 	
 	
-	public Patologia(int id_patol, String nom_patol, String des_patol, String tratamiento, String causa) {
+	public Patologia(int id_patol, String nom_patol, String des_patol, String tratamiento, String causa,List<Sintomas> lista_sintomas) {
 		super();
 		this.id_patol = id_patol;
 		this.nom_patol = nom_patol;
 		this.des_patol = des_patol;
 		this.tratamiento = tratamiento;
 		this.causa = causa;
-		
+		this.lista_sintomas = lista_sintomas;
+	}
+	
+	
+	public void setLista_sintomas(List<Sintomas> lista_sintomas) {
+		this.lista_sintomas = lista_sintomas;
 	}
 	public Patologia() {
 		// TODO Auto-generated constructor stub
@@ -55,6 +61,8 @@ public class Patologia {
 		this.causa = causa;
 	}
 
-
+    public List<Sintomas> getLista_sintomas() {
+		return lista_sintomas;
+	}
 	
 }

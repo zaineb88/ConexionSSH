@@ -1,20 +1,17 @@
 package Patologia;
-import java.util.ArrayList;
-import java.util.List;
-
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.List;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 
+public class Main {
 
-
-
-public class BuscarPatologia {
 	
 	private final static String S_PATH_FILE_PRIVATE_KEY = "id_rsa.ppk"; //\\windows absolut path of our ssh private key locally saved
 	private final static String S_PATH_FILE_KNOWN_HOSTS = "known_hosts";
@@ -30,7 +27,6 @@ public class BuscarPatologia {
 	private final static String user = "adminGXjlxzG";
 	private final static String password = "QBShkFDW_69e";
 	
-	
 	private static void conectate_A_SSH () throws Throwable
 	{
 		JSch jsch = new JSch();
@@ -38,7 +34,8 @@ public class BuscarPatologia {
         jsch.addIdentity(S_PATH_FILE_PRIVATE_KEY, S_PASS_PHRASE.getBytes());
 
         sesion = jsch.getSession(SSH_USER, SSH_REMOTE_SERVER, SSH_REMOTE_PORT);
-        sesion.connect();          
+        sesion.connect();  
+        
         sesion.setPortForwardingL(LOCAl_PORT, MYSQL_REMOTE_SERVER, REMOTE_PORT); 
 
 
@@ -49,77 +46,68 @@ public class BuscarPatologia {
 		sesion.disconnect();
 	}
 
-	
-	
 	public static void main(String[] args) throws Throwable {
-	
-		///////////no finciona el boucle no ser porque
-		
-	List<Patologia> le=listarPatologia(1);
-	
-	
-//	for(int i=0;i<le.size();i++)
-//	{
-//		System.out.println(le);
-//	}
-//		for(Patologia p: le)
-//		{
-//			System.out.println(p);
-//		}
-		
-		
-	//	listarPatologia(1);
-	}
-	
-	public static  List<Patologia> listarPatologia (int id) throws Throwable
-	
-	
-	{ 
-		List<Patologia> lista_p = null;
-		
-		lista_p = new ArrayList<Patologia>();
-	
+
+
 		Connection conn = null;
 		ResultSet rset = null;
 		Statement stmt = null;
 		
 		try
 		{
-			
-			
 			conectate_A_SSH();
 			
 			DriverManager.registerDriver (new com.mysql.jdbc.Driver());
 			conn = DriverManager.getConnection (cadena_conexion, user, password);
   	        stmt = conn.createStatement();
-			rset = stmt.executeQuery(" SELECT * From Patologias Where id_patol="+id);
-			String nom_patol=null;
-			String descripcion = null;
-			String tratamiento = null;
-			String causas = null;
-			
-			while (rset.next())
-				
-			    {
-					  nom_patol=rset.getString(2);
-					descripcion = rset.getString(3);
-					tratamiento = rset.getString(4);
-					causas = rset.getString(5);
-				
-					System.out.println("El nombre del patologia es  : "+nom_patol+"\n");
-					System.out.println("Descripcion de la patologia es   : "+descripcion +"\n");
-					System.out.println("Tratamiento de la patologia es   : "+tratamiento+"\n");
-					System.out.println("Causas de la patologia es   : "+causas+"\n");
-		
-		Patologia p = new Patologia(id, nom_patol,descripcion ,tratamiento,causas,null);
-			
-			
-			lista_p.add(p);
-	//	lista_p.add((Patologia) ListarSintomas.consultaSintoma());
-				 }
-
-			
-			
+  	        
+  	        
+  	      List<Patologia> lista_patologias = null;
+  	      List<Sintomas> lista_sintomas = null;
+  	      lista_patologias = Consultas.listarPatologias(stmt, conn);
+  	      Patologia pato=lista_patologias.get(0);
+  	    		  System.out.println(pato);
+  	      HashMap<Patologia, List<Sintomas>> hm = new HashMap<Patologia, List<Sintomas>>();
+  	    
+  	      
+  	      
+  	      //////////////////////
+  	      
+  	      for (Patologia patologia : lista_patologias) {
+  				lista_sintomas = Consultas.buscarSintomasPorPatologia(conn, patologia.getNom_patol());
+  	 	    	hm.put(patologia, lista_sintomas);
+  	 	    	System.out.println(patologia+" = "+hm.get(patologia));
+  	  	      }
+  	      
+         	List<Sintomas> ls= hm.get(pato);
+         	for(Sintomas sintoma:ls)
+          	{
+  	        	System.out.println(sintoma);
+  	          }
+//  	      /////////////////
+//
+//	      long tiempoInicial = System.currentTimeMillis();
+//	      System.out.println(tiempoInicial);
+//  	      /* Sin acceder a la base de datos */
+//  	      int id = 1;
+//  	      int i = 0;
+//  	      while(i<lista_patologias.size() && lista_patologias.get(i).getId_patol()!=id)
+//  	      {
+//  	    	  i++;
+//  	      }
+//  	      System.out.println(lista_patologias.get(i).getNom_patol());
+//  	      /* Accediendo a la base de datos */
+//  	      /*Patologia p = Consultas.buscarPatologiasPorId(stmt, conn, 3);
+//  	      System.out.println(p.getNombre());*/
+//  	      
+//  	      long tiempoFinal = System.currentTimeMillis();
+//  	      System.out.println(tiempoFinal);
+//  	      
+//  	      long tiempoTranscurrido = tiempoFinal - tiempoInicial;
+//  	      System.out.println(tiempoTranscurrido);
+//  	      //System.currentTimeMillis();
+//  	      
+//			
 		}
 		catch(Exception e)
 		{
@@ -133,13 +121,6 @@ public class BuscarPatologia {
 		  	desconectate_D_SSH(); 
 		}   
 
-		
-	
-
-		
-		
-		/////////////////////
-		return lista_p;
 		
 	}
 

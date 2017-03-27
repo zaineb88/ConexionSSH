@@ -28,6 +28,10 @@ public class Sintomas {
 	
 	
 	
-	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return this.des_sintoma;
+	}
 
 }
